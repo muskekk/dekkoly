@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dekkoly</title>
+    <style>
+        :root {
+            --bg: #1a1b26;
+            --bg-secondary: #24283b;
+            --fg: #a9b1d6;
+            --accent: #7aa2f7;
+            --accent2: #bb9af7;
+            --border: #414868;
+            --map-bg: rgba(26, 27, 38, 0.95);
+        }
+
+        .theme-tokyo-night {
+            --bg: #1a1b26;
+            --bg-secondary: #24283b;
+            --fg: #c0caf5;
+            --accent: #7aa2f7;
+            --accent2: #bb9af7;
+            --border: #414868;
+            --map-bg: rgba(26, 27, 38, 0.95);
+        }
+
+        .theme-dracula {
+            --bg: #282a36;
+            --bg-secondary: #44475a;
+            --fg: #f8f8f2;
+            --accent: #8be9fd;
+            --accent2: #50fa7b;
+            --border: #6272a4;
+            --map-bg: rgba(40, 42, 54, 0.95);
+        }
+
+        .theme-monokai {
+            --bg: #272822;
+            --bg-secondary: #3e3d32;
+            --fg: #f8f8f2;
+            --accent: #a6e22e;
+            --accent2: #f92672;
+            --border: #75715e;
+            --map-bg: rgba(39, 40, 34, 0.95);
+        }
+
+        .theme-molokai {
+            --bg: #1b1d1e;
+            --bg-secondary: #2c2e2f;
+            --fg: #f8f8f2;
+            --accent: #66d9ef;
+            --accent2: #a6e22e;
+            --border: #494949;
+            --map-bg: rgba(27, 29, 30, 0.95);
+        }
+
+        .theme-henna {
+            --bg: #2c0e0e;
+            --bg-secondary: #5c1a1a;
+            --fg: #e9c46a;
+            --accent: #d4a373;
+            --accent2: #e76f51;
+            --border: #8b3a3a;
+            --map-bg: rgba(44, 14, 14, 0.95);
+        }
+
+        .theme-oceanic {
+            --bg: #1b2b34;
+            --bg-secondary: #343d46;
+            --fg: #d8dee9;
+            --accent: #66999d;
+            --accent2: #99c794;
+            --border: #4f5b66;
+            --map-bg: rgba(27, 43, 52, 0.95);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #menu-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 25px;
+            z-index: 100;
+            position: absolute;
+            width: 100%;
+            background: var(--bg);
+        }
+
+        .game-title {
+            font-size: 4.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .game-subtitle {
+            font-size: 1.1rem;
+            color: var(--fg);
+            opacity: 0.6;
+            margin-top: -15px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .menu-btn {
+            padding: 16px 70px;
+            font-size: 1.3rem;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            min-width: 240px;
+        }
+
+        .menu-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(122, 162, 247, 0.4);
+        }
+
+        #char-select-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 150;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .char-select-title {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .char-select-layout {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .char-preview-box {
+            width: 200px;
+            height: 250px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .char-preview-box canvas {
+            width: 180px;
+            height: 180px;
+        }
+
+        .char-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 250px;
+        }
+
+        .char-setting {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .char-setting label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent2);
+        }
+
+        .char-setting input[type="text"] {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .char-setting input[type="color"] {
+            width: 100%;
+            height: 45px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .theme-chip {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--fg);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .theme-chip.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .char-btns {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .char-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--fg);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .char-btn.primary {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .char-btn.primary:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .char-btn:hover {
+            border-color: var(--accent2);
+        }
+
+        #settings-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+
+        .settings-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--accent);
+        }
+
+        .settings-group {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .settings-group h3 {
+            margin-bottom: 15px;
+            color: var(--accent2);
+            font-size: 1.1rem;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .setting-item label {
+            font-size: 0.95rem;
+        }
+
+        .setting-item select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .key-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--fg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            width: 60px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-transform: lowercase;
+        }
+
+        .key-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        #game-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        #minimap {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 150px;
+            height: 150px;
+            background: var(--map-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #minimap:hover {
+            transform: scale(1.05);
+        }
+
+        #minimap canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+        }
+
+        .hud-top-right {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .hud-btn {
+            width: 45px;
+            height: 45px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--fg);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .hud-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .theme-indicator {
+            position: absolute;
+            top: 70px;
+            right: 15px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            opacity: 0.8;
+            background: var(--bg-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        #big-map {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            height: 80vh;
+            background: var(--map-bg);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            z-index: 60;
+            pointer-events: auto;
+            padding: 20px;
+        }
+
+        #big-map h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        #big-map canvas {
+            width: 100%;
+            height: calc(100% - 50px);
+            border-radius: 8px;
+            background: var(--bg);
+        }
+
+        .map-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--fg);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        #chat-container {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            left: 15px;
+            width: 350px;
+            max-width: 80vw;
+            background: var(--map-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            z-index: 60;
+            pointer-events: auto;
+            overflow: hidden;
+        }
+
+        #chat-messages {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+
+        .chat-msg {
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .chat-msg .name {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            border-top: 1px solid var(--border);
+        }
+
+        #chat-input {
+            flex: 1;
+            background: var(--bg);
+            border: none;
+            color: var(--fg);
+            padding: 10px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        #chat-send {
+            background: var(--accent);
+            border: none;
+            color: var(--bg);
+            padding: 0 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #joystick-zone {
+            display: none;
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 120px;
+            height: 120px;
+            z-index: 55;
+            pointer-events: auto;
+        }
+
+        #joystick-base {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        #joystick-knob {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.8;
+            box-shadow: 0 0 15px rgba(122, 162, 247, 0.5);
+        }
+
+        .mobile-theme-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            color: var(--fg);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 55;
+            pointer-events: auto;
+            transition: all 0.2s;
+        }
+
+        .mobile-theme-btn:hover {
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .game-title { font-size: 2.8rem; }
+            .menu-btn { padding: 14px 50px; font-size: 1.1rem; min-width: 200px; }
+            .char-select-layout { flex-direction: column; gap: 20px; }
+            .char-preview-box { width: 160px; height: 200px; }
+            .char-preview-box canvas { width: 140px; height: 140px; }
+            #minimap { width: 100px; height: 100px; }
+            #chat-container { width: 90vw; left: 5vw; }
+            .mobile-theme-btn { display: flex; }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-theme-btn { display: none !important; }
+        }
+    </style>
+</head>
+<body class="theme-tokyo-night">
+    <div id="game-container">
+        <div id="menu-screen">
+            <h1 class="game-title">Dekkoly</h1>
+            <p class="game-subtitle">Multiplayer Game</p>
+            <button class="menu-btn" id="btn-play">PLAY</button>
+            <button class="menu-btn" id="btn-settings">Settings</button>
+        </div>
+
+        <div id="char-select-screen">
+            <h2 class="char-select-title">Customize Your Character</h2>
+            <div class="char-select-layout">
+                <div class="char-preview-box">
+                    <canvas id="char-preview-canvas" width="200" height="200"></canvas>
+                </div>
+                <div class="char-settings">
+                    <div class="char-setting">
+                        <label>Name</label>
+                        <input type="text" id="char-name" value="Player" maxlength="12">
+                    </div>
+                    <div class="char-setting">
+                        <label>Character Color</label>
+                        <input type="color" id="char-color" value="#7aa2f7">
+                    </div>
+                    <div class="char-setting">
+                        <label>Theme</label>
+                        <div class="theme-selector" id="theme-selector">
+                            <div class="theme-chip active" data-theme="tokyo-night">Tokyo Night</div>
+                            <div class="theme-chip" data-theme="dracula">Dracula</div>
+                            <div class="theme-chip" data-theme="monokai">Monokai</div>
+                            <div class="theme-chip" data-theme="molokai">Molokai</div>
+                            <div class="theme-chip" data-theme="henna">Henna</div>
+                            <div class="theme-chip" data-theme="oceanic">Oceanic</div>
+                        </div>
+                    </div>
+                    <div class="char-btns">
+                        <button class="char-btn" id="btn-char-back">Back</button>
+                        <button class="char-btn primary" id="btn-start-game">Start!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-screen">
+            <h2 class="settings-title">Settings</h2>
+            <div class="settings-group">
+                <h3>Input Mode</h3>
+                <div class="setting-item">
+                    <label>Control:</label>
+                    <select id="setting-input">
+                        <option value="auto">Auto</option>
+                        <option value="keyboard">Keyboard</option>
+                        <option value="touch">Touch</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>Shortcuts</h3>
+                <div class="setting-item">
+                    <label>Up:</label>
+                    <input type="text" class="key-input" id="key-up" value="w" maxlength="1">
+                </div>
+                <div class="setting-item">
+                    <label>Down:</label>
+                    <input type="text" class="key-input" id="key-down" value="s" maxlength="1">
+                </div>
+                <div class="setting-item">
+                    <label>Left:</label>
+                    <input type="text" class="key-input" id="key-left" value="a" maxlength="1">
+                </div>
+                <div class="setting-item">
+                    <label>Right:</label>
+                    <input type="text" class="key-input" id="key-right" value="d" maxlength="1">
+                </div>
+                <div class="setting-item">
+                    <label>Switch Theme:</label>
+                    <input type="text" class="key-input" id="key-theme" value="m" maxlength="1">
+                </div>
+                <div class="setting-item">
+                    <label>Map:</label>
+                    <input type="text" class="key-input" id="key-map" value="h" maxlength="1">
+                </div>
+                <div class="setting-item">
+                    <label>Chat:</label>
+                    <input type="text" class="key-input" id="key-chat" value="t" maxlength="1">
+                </div>
+            </div>
+            <button class="menu-btn" id="btn-back" style="margin-top: 10px;">Back</button>
+        </div>
+
+        <div id="game-screen">
+            <canvas id="game-canvas"></canvas>
+            <div id="hud">
+                <div id="minimap"><canvas id="minimap-canvas" width="150" height="150"></canvas></div>
+                <div class="hud-top-right">
+                    <button class="hud-btn" id="btn-hud-map" title="Map">🗺️</button>
+                    <button class="hud-btn" id="btn-hud-chat" title="Chat">💬</button>
+                    <button class="hud-btn" id="btn-hud-menu" title="Menu">☰</button>
+                </div>
+                <div class="theme-indicator" id="theme-name">Tokyo Night</div>
+            </div>
+            <div id="big-map">
+                <button class="map-close" id="btn-close-map">×</button>
+                <h2>World Map</h2>
+                <canvas id="bigmap-canvas" width="800" height="600"></canvas>
+            </div>
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" placeholder="Type a message...">
+                    <button id="chat-send">➤</button>
+                </div>
+            </div>
+            <div id="joystick-zone">
+                <div id="joystick-base"></div>
+                <div id="joystick-knob"></div>
+            </div>
+            <button class="mobile-theme-btn" id="btn-mobile-theme" title="Switch Theme">🎨</button>
+        </div>
+    </div>
+
+    <script>
+        const THEMES = ['tokyo-night', 'dracula', 'monokai', 'molokai', 'henna', 'oceanic'];
+        const THEME_NAMES = {
+            'tokyo-night': 'Tokyo Night',
+            'dracula': 'Dracula',
+            'monokai': 'Monokai',
+            'molokai': 'Molokai',
+            'henna': 'Henna',
+            'oceanic': 'Oceanic'
+        };
+
+        const MAP_WIDTH = 2000;
+        const MAP_HEIGHT = 2000;
+        const PLAYER_SPEED = 4;
+
+        let canvas, ctx, minimapCanvas, minimapCtx, bigmapCanvas, bigmapCtx, previewCanvas, previewCtx;
+        let gameLoopId;
+        let currentScreen = 'menu';
+        let currentThemeIdx = 0;
+        let showBigMap = false;
+        let showChat = false;
+        let useTouch = false;
+        let walkCycle = 0;
+
+        let player = {
+            x: MAP_WIDTH / 2,
+            y: MAP_HEIGHT / 2,
+            name: 'Player',
+            color: '#7aa2f7',
+            vx: 0,
+            vy: 0,
+            dir: 1
+        };
+
+        let keys = {};
+        let joystick = { active: false, dx: 0, dy: 0 };
+        let camera = { x: 0, y: 0 };
+        let parkours = [];
+        let chatMessages = [];
+
+        let shortcuts = {
+            up: 'w',
+            down: 's',
+            left: 'a',
+            right: 'd',
+            theme: 'm',
+            map: 'h',
+            chat: 't'
+        };
+
+        window.onload = () => {
+            initElements();
+            initEvents();
+            generateMap();
+            updateCharPreview();
+            checkInputMode();
+        };
+
+        function initElements() {
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+            minimapCanvas = document.getElementById('minimap-canvas');
+            minimapCtx = minimapCanvas.getContext('2d');
+            bigmapCanvas = document.getElementById('bigmap-canvas');
+            bigmapCtx = bigmapCanvas.getContext('2d');
+            previewCanvas = document.getElementById('char-preview-canvas');
+            previewCtx = previewCanvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function checkInputMode() {
+            const mode = document.getElementById('setting-input').value;
+            if (mode === 'auto') {
+                useTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            } else {
+                useTouch = mode === 'touch';
+            }
+        }
+
+        function generateMap() {
+            parkours = [];
+            const gridSize = 200;
+            const cols = Math.floor(MAP_WIDTH / gridSize);
+            const rows = Math.floor(MAP_HEIGHT / gridSize);
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cx = c * gridSize + gridSize / 2;
+                    const cy = r * gridSize + gridSize / 2;
+
+                    if (c < cols - 1 && Math.random() > 0.15) {
+                        const path = [];
+                        const steps = 8;
+                        for (let i = 0; i <= steps; i++) {
+                            const px = cx + (i / steps) * gridSize;
+                            const py = cy + Math.sin(i * 0.8) * 30 + (Math.random() - 0.5) * 20;
+                            path.push({ x: px, y: py });
+                        }
+                        parkours.push({ path, width: 20 + Math.random() * 10 });
+                    }
+
+                    if (r < rows - 1 && Math.random() > 0.15) {
+                        const path = [];
+                        const steps = 8;
+                        for (let i = 0; i <= steps; i++) {
+                            const px = cx + Math.sin(i * 0.8) * 30 + (Math.random() - 0.5) * 20;
+                            const py = cy + (i / steps) * gridSize;
+                            path.push({ x: px, y: py });
+                        }
+                        parkours.push({ path, width: 20 + Math.random() * 10 });
+                    }
+                }
+            }
+        }
+
+        function drawCharacter(ctx, x, y, size, color, dir, name, isLocal, walking) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(dir, 1);
+            const s = size / 100;
+            ctx.scale(s, s);
+            const bodyColor = darkenColor(color, 40);
+
+            const footOffset1 = walking ? Math.sin(walkCycle) * 10 : 0;
+            const footOffset2 = walking ? Math.sin(walkCycle + Math.PI) * 10 : 0;
+            const bodyBounce = walking ? Math.abs(Math.sin(walkCycle)) * 4 : 0;
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.ellipse(-20 + footOffset1, 48 + bodyBounce, 15, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.ellipse(20 + footOffset2, 48 + bodyBounce, 15, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = bodyColor;
+            ctx.save();
+            ctx.translate(0, bodyBounce);
+            roundRect(ctx, -25, 0, 50, 50, 8);
+            ctx.fill();
+            ctx.restore();
+
+            ctx.fillStyle = color;
+            ctx.save();
+            ctx.translate(0, bodyBounce * 0.5);
+            ctx.beginPath();
+            ctx.arc(0, -25, 35, 0, Math.PI * 2);
+            ctx.fill();
+
+            const eyeOffset = walking ? Math.sin(walkCycle * 0.5) * 2 : 0;
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(12 + eyeOffset, -30, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(28 + eyeOffset, -30, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#1a1a2e';
+            ctx.beginPath();
+            ctx.arc(14 + eyeOffset, -30, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(30 + eyeOffset, -30, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#1a1a2e';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(20, -18, 8, 0.2, Math.PI - 0.2);
+            ctx.stroke();
+            ctx.restore();
+
+            if (name) {
+                ctx.scale(dir, 1);
+                ctx.fillStyle = isLocal ? '#fff' : 'rgba(255,255,255,0.9)';
+                ctx.font = 'bold 12px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 4;
+                ctx.fillText(name, 0, -75);
+                ctx.shadowBlur = 0;
+            }
+            ctx.restore();
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function darkenColor(hex, percent) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = Math.max((num >> 16) - amt, 0);
+            const G = Math.max((num >> 8 & 0x00FF) - amt, 0);
+            const B = Math.max((num & 0x0000FF) - amt, 0);
+            return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+        }
+
+        function startGame() {
+            currentScreen = 'game';
+            document.getElementById('menu-screen').style.display = 'none';
+            document.getElementById('char-select-screen').style.display = 'none';
+            document.getElementById('settings-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            player.name = document.getElementById('char-name').value || 'Player';
+            player.color = document.getElementById('char-color').value;
+            checkInputMode();
+            if (useTouch) {
+                document.getElementById('joystick-zone').style.display = 'block';
+            }
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop() {
+            if (currentScreen !== 'game') return;
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            let dx = 0, dy = 0;
+            let isMoving = false;
+
+            if (joystick.active) {
+                dx = joystick.dx;
+                dy = joystick.dy;
+                if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) isMoving = true;
+            } else {
+                if (keys[shortcuts.up] || keys[shortcuts.up.toUpperCase()]) { dy = -1; isMoving = true; }
+                if (keys[shortcuts.down] || keys[shortcuts.down.toUpperCase()]) { dy = 1; isMoving = true; }
+                if (keys[shortcuts.left] || keys[shortcuts.left.toUpperCase()]) { dx = -1; isMoving = true; }
+                if (keys[shortcuts.right] || keys[shortcuts.right.toUpperCase()]) { dx = 1; isMoving = true; }
+            }
+
+            if (dx !== 0 || dy !== 0) {
+                const len = Math.sqrt(dx * dx + dy * dy);
+                dx /= len;
+                dy /= len;
+                player.vx = dx * PLAYER_SPEED;
+                player.vy = dy * PLAYER_SPEED;
+                if (dx > 0.1) player.dir = 1;
+                if (dx < -0.1) player.dir = -1;
+            } else {
+                player.vx = 0;
+                player.vy = 0;
+            }
+
+            if (isMoving) {
+                walkCycle += 0.25;
+            } else {
+                walkCycle = 0;
+            }
+
+            player.x = Math.max(30, Math.min(MAP_WIDTH - 30, player.x + player.vx));
+            player.y = Math.max(30, Math.min(MAP_HEIGHT - 30, player.y + player.vy));
+
+            camera.x = player.x - canvas.width / 2;
+            camera.y = player.y - canvas.height / 2;
+            camera.x = Math.max(0, Math.min(MAP_WIDTH - canvas.width, camera.x));
+            camera.y = Math.max(0, Math.min(MAP_HEIGHT - canvas.height, camera.y));
+        }
+
+        function render() {
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg').trim();
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y);
+
+            ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--border').trim();
+            ctx.globalAlpha = 0.1;
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= MAP_WIDTH; x += 100) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, MAP_HEIGHT);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= MAP_HEIGHT; y += 100) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(MAP_WIDTH, y);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+
+            parkours.forEach(pk => {
+                ctx.strokeStyle = 'rgba(180, 180, 180, 0.35)';
+                ctx.lineWidth = pk.width;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                if (pk.path.length > 0) {
+                    ctx.moveTo(pk.path[0].x, pk.path[0].y);
+                    for (let i = 1; i < pk.path.length; i++) {
+                        ctx.lineTo(pk.path[i].x, pk.path[i].y);
+                    }
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(200, 200, 200, 0.15)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                if (pk.path.length > 0) {
+                    ctx.moveTo(pk.path[0].x, pk.path[0].y);
+                    for (let i = 1; i < pk.path.length; i++) {
+                        ctx.lineTo(pk.path[i].x, pk.path[i].y);
+                    }
+                }
+                ctx.stroke();
+            });
+
+            const isWalking = Math.abs(player.vx) > 0.1 || Math.abs(player.vy) > 0.1;
+            drawCharacter(ctx, player.x, player.y, 80, player.color, player.dir, player.name, true, isWalking);
+
+            ctx.restore();
+            renderMinimap();
+        }
+
+        function renderMinimap() {
+            const w = minimapCanvas.width;
+            const h = minimapCanvas.height;
+            minimapCtx.clearRect(0, 0, w, h);
+            minimapCtx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-secondary').trim();
+            minimapCtx.fillRect(0, 0, w, h);
+
+            parkours.forEach(pk => {
+                minimapCtx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+                minimapCtx.lineWidth = Math.max(1, (pk.width / MAP_WIDTH) * w);
+                minimapCtx.beginPath();
+                if (pk.path.length > 0) {
+                    minimapCtx.moveTo((pk.path[0].x / MAP_WIDTH) * w, (pk.path[0].y / MAP_HEIGHT) * h);
+                    for (let i = 1; i < pk.path.length; i++) {
+                        minimapCtx.lineTo((pk.path[i].x / MAP_WIDTH) * w, (pk.path[i].y / MAP_HEIGHT) * h);
+                    }
+                }
+                minimapCtx.stroke();
+            });
+
+            const px = (player.x / MAP_WIDTH) * w;
+            const py = (player.y / MAP_HEIGHT) * h;
+            minimapCtx.fillStyle = player.color;
+            minimapCtx.beginPath();
+            minimapCtx.arc(px, py, 4, 0, Math.PI * 2);
+            minimapCtx.fill();
+            minimapCtx.strokeStyle = '#fff';
+            minimapCtx.lineWidth = 1;
+            minimapCtx.stroke();
+
+            minimapCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+            minimapCtx.lineWidth = 1;
+            const vw = (canvas.width / MAP_WIDTH) * w;
+            const vh = (canvas.height / MAP_HEIGHT) * h;
+            const vx = (camera.x / MAP_WIDTH) * w;
+            const vy = (camera.y / MAP_HEIGHT) * h;
+            minimapCtx.strokeRect(vx, vy, vw, vh);
+        }
+
+        function renderBigMap() {
+            if (!showBigMap) return;
+            const w = bigmapCanvas.width;
+            const h = bigmapCanvas.height;
+            bigmapCtx.clearRect(0, 0, w, h);
+            bigmapCtx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg').trim();
+            bigmapCtx.fillRect(0, 0, w, h);
+
+            bigmapCtx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--border').trim();
+            bigmapCtx.globalAlpha = 0.3;
+            for (let x = 0; x <= w; x += 40) {
+                bigmapCtx.beginPath();
+                bigmapCtx.moveTo(x, 0);
+                bigmapCtx.lineTo(x, h);
+                bigmapCtx.stroke();
+            }
+            for (let y = 0; y <= h; y += 40) {
+                bigmapCtx.beginPath();
+                bigmapCtx.moveTo(0, y);
+                bigmapCtx.lineTo(w, y);
+                bigmapCtx.stroke();
+            }
+            bigmapCtx.globalAlpha = 1;
+
+            parkours.forEach(pk => {
+                bigmapCtx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+                bigmapCtx.lineWidth = Math.max(2, (pk.width / MAP_WIDTH) * w);
+                bigmapCtx.lineCap = 'round';
+                bigmapCtx.beginPath();
+                if (pk.path.length > 0) {
+                    bigmapCtx.moveTo((pk.path[0].x / MAP_WIDTH) * w, (pk.path[0].y / MAP_HEIGHT) * h);
+                    for (let i = 1; i < pk.path.length; i++) {
+                        bigmapCtx.lineTo((pk.path[i].x / MAP_WIDTH) * w, (pk.path[i].y / MAP_HEIGHT) * h);
+                    }
+                }
+                bigmapCtx.stroke();
+            });
+
+            const px = (player.x / MAP_WIDTH) * w;
+            const py = (player.y / MAP_HEIGHT) * h;
+            bigmapCtx.fillStyle = player.color;
+            bigmapCtx.beginPath();
+            bigmapCtx.arc(px, py, 6, 0, Math.PI * 2);
+            bigmapCtx.fill();
+            bigmapCtx.strokeStyle = '#fff';
+            bigmapCtx.lineWidth = 2;
+            bigmapCtx.stroke();
+            bigmapCtx.fillStyle = '#fff';
+            bigmapCtx.font = 'bold 11px Segoe UI';
+            bigmapCtx.textAlign = 'center';
+            bigmapCtx.fillText(player.name + ' (You)', px, py + 18);
+        }
+
+        function addChatMessage(name, text) {
+            const div = document.createElement('div');
+            div.className = 'chat-msg';
+            div.innerHTML = `<span class="name">${escapeHtml(name)}:</span> ${escapeHtml(text)}`;
+            document.getElementById('chat-messages').appendChild(div);
+            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+            while (document.getElementById('chat-messages').children.length > 50) {
+                document.getElementById('chat-messages').removeChild(document.getElementById('chat-messages').firstChild);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (text) {
+                addChatMessage(player.name, text);
+                input.value = '';
+            }
+        }
+
+        function setTheme(themeName) {
+            document.body.classList.remove(`theme-${THEMES[currentThemeIdx]}`);
+            currentThemeIdx = THEMES.indexOf(themeName);
+            document.body.classList.add(`theme-${themeName}`);
+            document.getElementById('theme-name').textContent = THEME_NAMES[themeName];
+            document.querySelectorAll('.theme-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.theme === themeName);
+            });
+        }
+
+        function nextTheme() {
+            const next = (currentThemeIdx + 1) % THEMES.length;
+            setTheme(THEMES[next]);
+        }
+
+        function initEvents() {
+            document.getElementById('btn-play').onclick = () => {
+                document.getElementById('menu-screen').style.display = 'none';
+                document.getElementById('char-select-screen').style.display = 'flex';
+                updateCharPreview();
+            };
+
+            document.getElementById('btn-settings').onclick = () => {
+                document.getElementById('menu-screen').style.display = 'none';
+                document.getElementById('settings-screen').style.display = 'flex';
+            };
+
+            document.getElementById('btn-char-back').onclick = () => {
+                document.getElementById('char-select-screen').style.display = 'none';
+                document.getElementById('menu-screen').style.display = 'flex';
+            };
+
+            document.getElementById('btn-start-game').onclick = startGame;
+            document.getElementById('char-color').oninput = updateCharPreview;
+            document.getElementById('char-name').oninput = updateCharPreview;
+
+            document.querySelectorAll('.theme-chip').forEach(chip => {
+                chip.onclick = () => setTheme(chip.dataset.theme);
+            });
+
+            document.getElementById('btn-back').onclick = () => {
+                document.getElementById('settings-screen').style.display = 'none';
+                document.getElementById('menu-screen').style.display = 'flex';
+            };
+
+            window.addEventListener('keydown', e => {
+                keys[e.key] = true;
+                if (currentScreen === 'game') {
+                    if (e.key.toLowerCase() === shortcuts.theme) {
+                        e.preventDefault();
+                        nextTheme();
+                    }
+                    if (e.key.toLowerCase() === shortcuts.map) {
+                        e.preventDefault();
+                        toggleBigMap();
+                    }
+                    if (e.key.toLowerCase() === shortcuts.chat) {
+                        e.preventDefault();
+                        toggleChat();
+                    }
+                    if (e.key === 'Escape') {
+                        if (showBigMap) toggleBigMap();
+                        else if (showChat) toggleChat();
+                        else backToMenu();
+                    }
+                }
+            });
+
+            window.addEventListener('keyup', e => {
+                keys[e.key] = false;
+            });
+
+            document.getElementById('btn-hud-map').onclick = toggleBigMap;
+            document.getElementById('btn-hud-chat').onclick = toggleChat;
+            document.getElementById('btn-hud-menu').onclick = backToMenu;
+            document.getElementById('btn-close-map').onclick = toggleBigMap;
+            document.getElementById('minimap').onclick = toggleBigMap;
+            document.getElementById('btn-mobile-theme').onclick = nextTheme;
+
+            document.getElementById('chat-send').onclick = sendChat;
+            document.getElementById('chat-input').addEventListener('keypress', e => {
+                if (e.key === 'Enter') sendChat();
+            });
+
+            const joyZone = document.getElementById('joystick-zone');
+            const joyKnob = document.getElementById('joystick-knob');
+            let joyCenter = { x: 0, y: 0 };
+
+            joyZone.addEventListener('touchstart', e => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = joyZone.getBoundingClientRect();
+                joyCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                joystick.active = true;
+                updateJoystick(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            joyZone.addEventListener('touchmove', e => {
+                e.preventDefault();
+                if (!joystick.active) return;
+                const touch = e.touches[0];
+                updateJoystick(touch.clientX, touch.clientY);
+            }, { passive: false });
+
+            joyZone.addEventListener('touchend', e => {
+                e.preventDefault();
+                joystick.active = false;
+                joystick.dx = 0;
+                joystick.dy = 0;
+                joyKnob.style.transform = `translate(-50%, -50%)`;
+            });
+
+            function updateJoystick(x, y) {
+                const maxDist = 35;
+                let dx = x - joyCenter.x;
+                let dy = y - joyCenter.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > maxDist) {
+                    dx = (dx / dist) * maxDist;
+                    dy = (dy / dist) * maxDist;
+                }
+                joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+                joystick.dx = dx / maxDist;
+                joystick.dy = dy / maxDist;
+            }
+
+            let mouseDown = false;
+            joyZone.addEventListener('mousedown', e => {
+                mouseDown = true;
+                const rect = joyZone.getBoundingClientRect();
+                joyCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+                updateJoystick(e.clientX, e.clientY);
+            });
+            window.addEventListener('mousemove', e => {
+                if (mouseDown) updateJoystick(e.clientX, e.clientY);
+            });
+            window.addEventListener('mouseup', () => {
+                mouseDown = false;
+                joystick.active = false;
+                joystick.dx = 0;
+                joystick.dy = 0;
+                joyKnob.style.transform = `translate(-50%, -50%)`;
+            });
+        }
+
+        function updateCharPreview() {
+            const c = previewCanvas;
+            const cx = previewCtx;
+            const color = document.getElementById('char-color').value;
+            const name = document.getElementById('char-name').value || 'Player';
+            cx.clearRect(0, 0, c.width, c.height);
+            drawCharacter(cx, c.width / 2, c.height / 2 + 20, 90, color, 1, name, true, false);
+        }
+
+        function toggleBigMap() {
+            showBigMap = !showBigMap;
+            document.getElementById('big-map').style.display = showBigMap ? 'block' : 'none';
+            if (showBigMap) renderBigMap();
+        }
+
+        function toggleChat() {
+            showChat = !showChat;
+            document.getElementById('chat-container').style.display = showChat ? 'block' : 'none';
+            if (showChat) document.getElementById('chat-input').focus();
+        }
+
+        function backToMenu() {
+            currentScreen = 'menu';
+            cancelAnimationFrame(gameLoopId);
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('menu-screen').style.display = 'flex';
+            document.getElementById('joystick-zone').style.display = 'none';
+            showBigMap = false;
+            showChat = false;
+            document.getElementById('big-map').style.display = 'none';
+            document.getElementById('chat-container').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

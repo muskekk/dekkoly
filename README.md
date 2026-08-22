@@ -1,4 +1,4 @@
-[site][muskekk.github.io/dekkoly]
+[site](muskekk.github.io/dekkoly)
 
 # Dekkoly
 
